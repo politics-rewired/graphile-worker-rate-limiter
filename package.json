@@ -1,0 +1,37 @@
+{
+  "name": "graphile-worker-rate-limiter",
+  "version": "0.0.1",
+  "description": "A collection of rate limiters for graphile worker",
+  "main": "dist/index.js",
+  "author": "Ben Packer <ben.paul.ryan.packer@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "prepack": "rm -Rf dist && tsc ",
+    "lint": "yarn prettier:check && eslint --ext .js,.jsx,.ts,.tsx,.graphql .",
+    "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx,.graphql . --fix; prettier --ignore-path .eslintignore --write '**/*.{js,jsx,ts,tsx,graphql,md,json}'",
+    "prettier:check": "prettier --ignore-path .eslintignore --check '**/*.{js,jsx,ts,tsx,graphql,md,json}'",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "perfTest": "yarn prepack && node ./perfTest/run.js"
+  },
+  "devDependencies": {
+    "@types/pg": "^7.14.4",
+    "eslint": "^7.7.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "jest": "^26.4.0",
+    "pg": "^8.3.0",
+    "ts-jest": "^26.2.0",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  },
+  "peerDependencies": {
+    "graphile-worker": "^0.6.0"
+  },
+  "dependencies": {
+    "@types/ioredis": "^4.17.3",
+    "ioredis": "^4.17.3"
+  }
+}
