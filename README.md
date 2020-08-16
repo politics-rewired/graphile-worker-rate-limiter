@@ -1,6 +1,6 @@
 # Graphile Worker Rate Limiter
 
-A set of utilities to add rate limiting to (graphile-worker)[https://github.com/graphile/worker/]. For context, see (this issue)[https://github.com/graphile/worker/issues/118].
+A set of utilities to add rate limiting to [graphile-worker](https://github.com/graphile/worker/). For context, see [this issue](https://github.com/graphile/worker/issues/118).
 
 ## Usage
 
