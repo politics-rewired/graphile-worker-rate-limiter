@@ -31,7 +31,7 @@ describe('integration test', () => {
         bucket: {
           capacity: 6,
           drainCount: 3,
-          drainInterval: 1000,
+          drainInterval: 2000,
         },
       },
     });
