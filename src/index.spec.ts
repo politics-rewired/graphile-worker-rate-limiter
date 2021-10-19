@@ -6,13 +6,21 @@ import { getLeakyBucketRateLimiter } from './LeakyBucket';
 
 const sleep = (n: number) => new Promise((resolve) => setTimeout(resolve, n));
 
-const redis = new Redis(process.env.REDIS_URL);
-const pool = new Pool({ connectionString: process.env.TEST_DATABASE_URL });
-
 describe('integration test', () => {
+  let redis: Redis.Redis;
+  let pool: Pool;
+
   beforeAll(async () => {
+    redis = new Redis(process.env.REDIS_URL);
+    pool = new Pool({ connectionString: process.env.TEST_DATABASE_URL });
+
     await redis.flushall();
     await pool.query('delete from graphile_worker.jobs');
+  });
+
+  afterAll(async () => {
+    await pool.end();
+    await redis.quit();
   });
 
   test('a whole bunch of things', async () => {
@@ -47,7 +55,7 @@ describe('integration test', () => {
 
     // if i add 7 jobs, 6 should be run after 100ms, but the 7th shouldnt be run until after 1.1 seconds
     await Promise.all(
-      new Array(7).fill(1).map((_, n) => {
+      [...Array(7)].map((_, n) => {
         runningWorker.addJob('task', { n: n + 1 }, { flags: ['bucket:a'] });
       }),
     );
@@ -58,5 +66,8 @@ describe('integration test', () => {
 
     await sleep(1500);
     expect(highestN).toBe(7);
+
+    await rateLimiter.stop();
+    await runningWorker.stop();
   });
 });
