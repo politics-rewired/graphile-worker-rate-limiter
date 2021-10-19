@@ -37,7 +37,7 @@ const worker = await run({
   // graphile worker options as normal, except...
   forbiddenFlags: rateLimiter.getForbiddenFlags,
   taskList: {
-    'send-message': wrapTask(sendMessage)
+    'send-message': rateLimiter.wrapTask(sendMessage)
   }
 });
 ```
