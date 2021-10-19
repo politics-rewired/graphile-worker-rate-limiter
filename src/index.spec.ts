@@ -6,8 +6,8 @@ import { getLeakyBucketRateLimiter } from './LeakyBucket';
 
 const sleep = (n: number) => new Promise((resolve) => setTimeout(resolve, n));
 
-const redis = new Redis();
-const pool = new Pool({});
+const redis = new Redis(process.env.REDIS_URL);
+const pool = new Pool({ connectionString: process.env.TEST_DATABASE_URL });
 
 describe('integration test', () => {
   beforeAll(async () => {

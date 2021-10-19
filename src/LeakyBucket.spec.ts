@@ -10,7 +10,7 @@ import {
 
 const sleep = (n: number) => new Promise((resolve) => setTimeout(resolve, n));
 
-const redis = new Redis();
+const redis = new Redis(process.env.REDIS_URL);
 
 describe('make drain bucket', () => {
   beforeAll(async () => {
