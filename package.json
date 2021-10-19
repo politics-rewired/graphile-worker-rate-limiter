@@ -15,6 +15,13 @@
     "test:watch": "jest --watch",
     "perfTest": "yarn prepack && node ./perfTest/run.js"
   },
+  "dependencies": {
+    "@types/ioredis": "^4.17.3",
+    "ioredis": "^4.17.3"
+  },
+  "peerDependencies": {
+    "graphile-worker": "^0.6.0"
+  },
   "devDependencies": {
     "@types/pg": "^7.14.4",
     "eslint": "^7.7.0",
@@ -26,12 +33,5 @@
     "ts-jest": "^26.2.0",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
-  },
-  "peerDependencies": {
-    "graphile-worker": "^0.6.0"
-  },
-  "dependencies": {
-    "@types/ioredis": "^4.17.3",
-    "ioredis": "^4.17.3"
   }
 }
