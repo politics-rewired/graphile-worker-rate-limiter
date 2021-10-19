@@ -52,7 +52,7 @@ describe('integration test', () => {
       }),
     );
 
-    await sleep(100);
+    await sleep(500);
 
     expect(highestN).toBe(6);
 
