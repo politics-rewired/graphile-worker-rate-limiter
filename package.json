@@ -20,7 +20,7 @@
     "ioredis": "^4.17.3"
   },
   "peerDependencies": {
-    "graphile-worker": "^0.6.0"
+    "graphile-worker": ">=0.6.0 <1"
   },
   "devDependencies": {
     "@types/pg": "^7.14.4",
