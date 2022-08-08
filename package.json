@@ -1,6 +1,6 @@
 {
   "name": "graphile-worker-rate-limiter",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A collection of rate limiters for graphile worker",
   "main": "dist/index.js",
   "author": "Ben Packer <ben.paul.ryan.packer@gmail.com>",
