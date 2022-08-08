@@ -1,1 +1,1 @@
-export { getLeakyBucketRateLimiter } from "./LeakyBucket";
+export { getLeakyBucketRateLimiter } from './LeakyBucket';

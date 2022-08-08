@@ -1,19 +1,19 @@
 #!/usr/bin/env node
-const { execSync, exec: rawExec } = require("child_process");
-const { promisify } = require("util");
-const worker = require("graphile-worker");
+const { execSync, exec: rawExec } = require('child_process');
+const { promisify } = require('util');
+const worker = require('graphile-worker');
 const exec = promisify(rawExec);
 
 const JOB_COUNT = 40000;
 const PARALLELISM = 4;
 
-const logIf999 = ({ id }) => {
+const _logIf999 = ({ id }) => {
   if (id === 999) {
-    console.log("Found 999!");
+    console.log('Found 999!');
   }
 };
 
-const time = async cb => {
+const time = async (cb) => {
   const start = process.hrtime();
   await cb();
   const diff = process.hrtime(start);
@@ -25,11 +25,12 @@ const time = async cb => {
 // run in this script's parent directory
 process.chdir(__dirname);
 
-process.env.NO_LOG_SUCCESS = "1";
+process.env.NO_LOG_SUCCESS = '1';
 
 // if connection string not provided, assume postgres is available locally
-process.env.PERF_DATABASE_URL = `${process.env.TEST_CONNECTION_STRING ||
-  "graphile_worker_perftest"}`;
+process.env.PERF_DATABASE_URL = `${
+  process.env.TEST_CONNECTION_STRING || 'graphile_worker_perftest'
+}`;
 
 const env = {
   ...process.env,
@@ -38,14 +39,14 @@ const env = {
 
 const execOptions = {
   env,
-  stdio: ["ignore", "ignore", "inherit"],
+  stdio: ['ignore', 'ignore', 'inherit'],
 };
 
 async function main() {
-  console.log("Dropping and recreating the test database");
-  execSync("node ./recreateDb.js", execOptions);
+  console.log('Dropping and recreating the test database');
+  execSync('node ./recreateDb.js', execOptions);
 
-  console.log("Installing the schema");
+  console.log('Installing the schema');
   await worker.runMigrations({
     connectionString: process.env.PERF_DATABASE_URL,
   });
@@ -86,7 +87,7 @@ async function main() {
   console.log();
 }
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });

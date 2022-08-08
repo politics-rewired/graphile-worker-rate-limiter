@@ -1,4 +1,4 @@
-import { ForbiddenFlagsFn, Task } from "graphile-worker";
+import { ForbiddenFlagsFn, Task } from 'graphile-worker';
 
 export type WrapTaskFn = (t: Task) => Task;
 

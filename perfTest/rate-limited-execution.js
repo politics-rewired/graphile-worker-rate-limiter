@@ -1,6 +1,6 @@
-const worker = require("graphile-worker");
-const Redis = require("ioredis");
-const GraphileWorkerRateLimiter = require("../dist/index");
+const worker = require('graphile-worker');
+const Redis = require('ioredis');
+const GraphileWorkerRateLimiter = require('../dist/index');
 
 const redis = new Redis();
 
@@ -10,7 +10,7 @@ const STANDARD = {
   drainCount: 100,
 };
 
-const SLOW = {
+const _SLOW = {
   capacity: 4000,
   drainInterval: 5000,
   drainCount: 2,
@@ -25,7 +25,7 @@ const rateLimiter = GraphileWorkerRateLimiter.getLeakyBucketRateLimiter({
 
 const logIf999 = ({ id }) => {
   if (id === 999) {
-    console.log("Found 999!");
+    console.log('Found 999!');
   }
 };
 

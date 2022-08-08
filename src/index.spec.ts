@@ -1,21 +1,21 @@
-import { Pool } from "pg";
-import { run } from "graphile-worker";
-import * as Redis from "ioredis";
-import { Task } from "graphile-worker";
-import { getLeakyBucketRateLimiter } from "./LeakyBucket";
+import { run, Task } from 'graphile-worker';
+import * as Redis from 'ioredis';
+import { Pool } from 'pg';
 
-const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n));
+import { getLeakyBucketRateLimiter } from './LeakyBucket';
+
+const sleep = (n: number) => new Promise((resolve) => setTimeout(resolve, n));
 
 const redis = new Redis();
 const pool = new Pool({});
 
-describe("integration test", () => {
+describe('integration test', () => {
   beforeAll(async () => {
     await redis.flushall();
-    await pool.query("delete from graphile_worker.jobs");
+    await pool.query('delete from graphile_worker.jobs');
   });
 
-  test("a whole bunch of things", async () => {
+  test('a whole bunch of things', async () => {
     const rateLimiter = getLeakyBucketRateLimiter({
       redis,
       bucketTypes: {
@@ -48,7 +48,7 @@ describe("integration test", () => {
     // if i add 7 jobs, 6 should be run after 100ms, but the 7th shouldnt be run until after 1.1 seconds
     await Promise.all(
       new Array(7).fill(1).map((_, n) => {
-        runningWorker.addJob("task", { n: n + 1 }, { flags: ["bucket:a"] });
+        runningWorker.addJob('task', { n: n + 1 }, { flags: ['bucket:a'] });
       }),
     );
 

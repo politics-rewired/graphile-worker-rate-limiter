@@ -1,2 +1,4 @@
 node_modules
 dist
+CHANGELOG.md
+tsconfig.json

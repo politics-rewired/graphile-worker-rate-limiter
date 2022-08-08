@@ -1,22 +1,23 @@
-import * as Redis from "ioredis";
+import * as Redis from 'ioredis';
+
 import {
-  makeDrainBucket,
+  getLeakyBucketRateLimiter,
+  handleBucketUse,
   LeakyBucketSpec,
   LeakyBucketSpecialKeys,
-  handleBucketUse,
-  getLeakyBucketRateLimiter,
-} from "./LeakyBucket";
+  makeDrainBucket,
+} from './LeakyBucket';
 
-const sleep = (n: number) => new Promise(resolve => setTimeout(resolve, n));
+const sleep = (n: number) => new Promise((resolve) => setTimeout(resolve, n));
 
 const redis = new Redis();
 
-describe("make drain bucket", () => {
+describe('make drain bucket', () => {
   beforeAll(async () => {
     await redis.flushall();
   });
 
-  test("no double drain on simultaneous fire", async () => {
+  test('no double drain on simultaneous fire', async () => {
     // drain 1 every 5 seconds, allow up to 100
     const bucketSpec: LeakyBucketSpec = {
       capacity: 100,
@@ -31,8 +32,8 @@ describe("make drain bucket", () => {
         .map(() =>
           handleBucketUse(
             redis,
-            "double-drain-test",
-            "instance-one",
+            'double-drain-test',
+            'instance-one',
             bucketSpec,
           ),
         ),
@@ -40,27 +41,23 @@ describe("make drain bucket", () => {
 
     // Expect bucket count to be 10
     const beforeDrain = await redis.get(
-      `double-drain-test:instance-one:${
-        LeakyBucketSpecialKeys.BucketCurrentCapacity
-      }`,
+      `double-drain-test:instance-one:${LeakyBucketSpecialKeys.BucketCurrentCapacity}`,
     );
     expect(parseInt(beforeDrain!)).toBe(10);
 
     // Run the drain fn twice
-    const drainFn = makeDrainBucket(redis, "double-drain-test", bucketSpec);
+    const drainFn = makeDrainBucket(redis, 'double-drain-test', bucketSpec);
     await drainFn();
     await drainFn();
 
     // Expect bucket count to be 9 because of lock
     const afterDrain = await redis.get(
-      `double-drain-test:instance-one:${
-        LeakyBucketSpecialKeys.BucketCurrentCapacity
-      }`,
+      `double-drain-test:instance-one:${LeakyBucketSpecialKeys.BucketCurrentCapacity}`,
     );
     expect(parseInt(afterDrain!)).toBe(9);
   });
 
-  test("drain lock released for drain interval", async () => {
+  test('drain lock released for drain interval', async () => {
     // drain 1 every 5 seconds, allow up to 100
     const bucketSpec: LeakyBucketSpec = {
       capacity: 100,
@@ -75,8 +72,8 @@ describe("make drain bucket", () => {
         .map(() =>
           handleBucketUse(
             redis,
-            "after-interval-drain-test",
-            "instance-one",
+            'after-interval-drain-test',
+            'instance-one',
             bucketSpec,
           ),
         ),
@@ -84,16 +81,14 @@ describe("make drain bucket", () => {
 
     // Expect bucket count to be 10
     const beforeDrain = await redis.get(
-      `after-interval-drain-test:instance-one:${
-        LeakyBucketSpecialKeys.BucketCurrentCapacity
-      }`,
+      `after-interval-drain-test:instance-one:${LeakyBucketSpecialKeys.BucketCurrentCapacity}`,
     );
     expect(parseInt(beforeDrain!)).toBe(10);
 
     // Run the drain fn twice
     const drainFn = makeDrainBucket(
       redis,
-      "after-interval-drain-test",
+      'after-interval-drain-test',
       bucketSpec,
     );
     await drainFn();
@@ -103,18 +98,16 @@ describe("make drain bucket", () => {
 
     // Expect bucket count to be 8 because drain interval passed
     const afterDrain = await redis.get(
-      `after-interval-drain-test:instance-one:${
-        LeakyBucketSpecialKeys.BucketCurrentCapacity
-      }`,
+      `after-interval-drain-test:instance-one:${LeakyBucketSpecialKeys.BucketCurrentCapacity}`,
     );
     expect(parseInt(afterDrain!)).toBe(8);
   });
 });
 
-describe("handle bucket use", () => {
-  test("can overload bucket", async () => {
-    const BUCKET_TYPE = "simple-overload";
-    const BUCKET_NAME = "one";
+describe('handle bucket use', () => {
+  test('can overload bucket', async () => {
+    const BUCKET_TYPE = 'simple-overload';
+    const BUCKET_NAME = 'one';
 
     // one per second
     const bucketSpec: LeakyBucketSpec = {
@@ -134,10 +127,10 @@ describe("handle bucket use", () => {
   });
 });
 
-describe("integration", () => {
-  test("can only run one per second", async () => {
-    const BUCKET_TYPE = "integration";
-    const BUCKET_NAMES = ["one", "two", "three"];
+describe('integration', () => {
+  test('can only run one per second', async () => {
+    const BUCKET_TYPE = 'integration';
+    const BUCKET_NAMES = ['one', 'two', 'three'];
 
     const BUCKET_SPEC: LeakyBucketSpec = {
       capacity: 1,
@@ -153,15 +146,15 @@ describe("integration", () => {
     });
 
     await Promise.all([
-      handleBucketUse(redis, BUCKET_TYPE, "one", BUCKET_SPEC),
-      handleBucketUse(redis, BUCKET_TYPE, "two", BUCKET_SPEC),
-      handleBucketUse(redis, BUCKET_TYPE, "three", BUCKET_SPEC),
+      handleBucketUse(redis, BUCKET_TYPE, 'one', BUCKET_SPEC),
+      handleBucketUse(redis, BUCKET_TYPE, 'two', BUCKET_SPEC),
+      handleBucketUse(redis, BUCKET_TYPE, 'three', BUCKET_SPEC),
     ]);
 
     // First, check they are all forbidden
     const initialForbidden = await rateLimiter.getForbiddenFlags();
     expect(
-      BUCKET_NAMES.every(name =>
+      BUCKET_NAMES.every((name) =>
         initialForbidden.includes(`${BUCKET_TYPE}:${name}`),
       ),
     ).toBe(true);
@@ -173,7 +166,7 @@ describe("integration", () => {
     const forbiddenAfterASecond = await rateLimiter.getForbiddenFlags();
     expect(
       BUCKET_NAMES.every(
-        name => !forbiddenAfterASecond.includes(`${BUCKET_TYPE}:${name}`),
+        (name) => !forbiddenAfterASecond.includes(`${BUCKET_TYPE}:${name}`),
       ),
     ).toBe(true);
   });

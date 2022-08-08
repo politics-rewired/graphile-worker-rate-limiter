@@ -1,6 +1,5 @@
-const { Pool } = require("pg");
-const Redis = require("ioredis");
-const { parse } = require("pg-connection-string");
+const { Pool } = require('pg');
+const { parse } = require('pg-connection-string');
 
 if (!process.env.PERF_DATABASE_URL) {
   throw new Error(
@@ -10,7 +9,7 @@ if (!process.env.PERF_DATABASE_URL) {
 const config = parse(process.env.PERF_DATABASE_URL);
 // don't connect to the provided db, or we can't drop it
 
-const pgPool = new Pool({ ...config, database: "template1" });
+const pgPool = new Pool({ ...config, database: 'template1' });
 
 async function main() {
   const pgClient = await pgPool.connect();
@@ -27,7 +26,7 @@ async function main() {
 
 main()
   .then(() => pgPool.end())
-  .catch(e => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   });
