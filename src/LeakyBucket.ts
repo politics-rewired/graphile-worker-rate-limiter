@@ -96,10 +96,11 @@ export const getLeakyBucketRateLimiter = (
    */
   const wrapTask: WrapTaskFn = (t: Task): Task => {
     return async (payload: unknown, helpers: JobHelpers) => {
-      if (helpers.job.flags && helpers.job.flags.length > 0) {
+      const flags = Object.keys(helpers.job.flags ?? {});
+      if (flags.length > 0) {
         await Promise.all(
-          helpers.job
-            .flags!.map((flag) => flag.split(':'))
+          flags
+            .map((flag) => flag.split(':'))
             .filter((flag) => flag.length === 2)
             .filter((flag) => bucketTypes[flag[0]])
             .map((flag) =>

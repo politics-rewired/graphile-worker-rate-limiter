@@ -152,7 +152,7 @@ describe('integration', () => {
     ]);
 
     // First, check they are all forbidden
-    const initialForbidden = await rateLimiter.getForbiddenFlags();
+    const initialForbidden = (await rateLimiter.getForbiddenFlags()) ?? [];
     expect(
       BUCKET_NAMES.every((name) =>
         initialForbidden.includes(`${BUCKET_TYPE}:${name}`),
@@ -163,7 +163,7 @@ describe('integration', () => {
     await sleep(1100);
 
     // Now, none should be
-    const forbiddenAfterASecond = await rateLimiter.getForbiddenFlags();
+    const forbiddenAfterASecond = (await rateLimiter.getForbiddenFlags()) ?? [];
     expect(
       BUCKET_NAMES.every(
         (name) => !forbiddenAfterASecond.includes(`${BUCKET_TYPE}:${name}`),
