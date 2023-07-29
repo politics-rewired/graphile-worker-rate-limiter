@@ -16,6 +16,9 @@
     "perfTest": "yarn prepack && node ./perfTest/run.js",
     "release": "standard-version"
   },
+  "files": [
+    "dist/"
+  ],
   "dependencies": {
     "@types/ioredis": "^4.17.3",
     "ioredis": "^4.17.3"
