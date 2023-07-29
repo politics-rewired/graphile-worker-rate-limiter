@@ -76,8 +76,11 @@ export const makeDrainBucket = (
           if (newVal < 0) {
             await redis
               .multi()
-              .del(`${bucketTypeName}:${bucketName}:${LeakyBucketSpecialKeys}`)
-              .srem(bucketTypeName, bucketName);
+              .del(
+                `${bucketTypeName}:${bucketName}:${LeakyBucketSpecialKeys.BucketCurrentCapacity}`,
+              )
+              .srem(bucketTypeName, bucketName)
+              .exec();
           }
         }
       }),
