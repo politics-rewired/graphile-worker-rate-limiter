@@ -25,6 +25,7 @@ interface LeakyBucketRateLimiterOptions {
 
 interface LeakyBucketRateLimiter extends RateLimiter {
   stop: () => void;
+  drainAllBucketsOnce: () => Promise<void>;
 }
 
 /**
@@ -119,6 +120,14 @@ export const getLeakyBucketRateLimiter = (
     return await redis.smembers(LeakyBucketSpecialKeys.OverloadedBuckets);
   };
 
+  const drainAllBucketsOnce = async () => {
+    await Promise.all(
+      Object.keys(bucketTypes).map((bucketName) =>
+        makeDrainBucket(redis, bucketName, bucketTypes[bucketName])(),
+      ),
+    );
+  };
+
   const intervals = Object.keys(bucketTypes).map((bucketName) =>
     setInterval(
       makeDrainBucket(redis, bucketName, bucketTypes[bucketName]),
@@ -132,7 +141,7 @@ export const getLeakyBucketRateLimiter = (
     }
   };
 
-  return { wrapTask, getForbiddenFlags, stop };
+  return { wrapTask, getForbiddenFlags, drainAllBucketsOnce, stop };
 };
 
 export const handleBucketUse = async (
