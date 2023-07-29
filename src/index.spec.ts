@@ -27,11 +27,11 @@ describe('integration test', () => {
     const rateLimiter = getLeakyBucketRateLimiter({
       redis,
       bucketTypes: {
-        // Drain at 3 invocations a second
+        // Drain at 3 invocations per 1.5 seconds
         bucket: {
           capacity: 6,
           drainCount: 3,
-          drainInterval: 1000,
+          drainInterval: 1500,
         },
       },
     });
@@ -64,7 +64,7 @@ describe('integration test', () => {
 
     expect(highestN).toBe(6);
 
-    await sleep(1500);
+    await sleep(2500);
     expect(highestN).toBe(7);
 
     await rateLimiter.stop();
