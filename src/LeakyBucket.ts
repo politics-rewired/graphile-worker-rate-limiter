@@ -53,16 +53,12 @@ export const makeDrainBucket = (
           .exec();
 
         const lockVal = await redis.get(key);
-        console.log('lockVal', lockVal);
-        console.log('randomValue', randomValue);
 
         if (lockVal !== null && lockVal === randomValue) {
           const newVal = await redis.decrby(
             `${bucketTypeName}:${bucketName}:${LeakyBucketSpecialKeys.BucketCurrentCapacity}`,
             bucketSpec.drainCount,
           );
-
-          console.log('newVal', newVal);
 
           // remove from overloaded buckets if now below capacity
           if (newVal < bucketSpec.capacity) {
