@@ -56,16 +56,14 @@ describe('integration test', () => {
       );
 
     // if i add 7 jobs, 6 should be run after 100ms, but the 7th shouldnt be run until after 1.1 seconds
-    await Promise.all(
-      [...Array(7)].map((_, n) =>
-        quickAddJob(
-          { pgPool: pool },
-          'task',
-          { n: n + 1 },
-          { flags: ['bucket:a'] },
-        ),
-      ),
-    );
+    for (const n of [...Array(7)].map((_, idx) => idx)) {
+      await quickAddJob(
+        { pgPool: pool },
+        'task',
+        { n: n + 1 },
+        { flags: ['bucket:a'] },
+      );
+    }
 
     for (const _ of [...Array(7)]) {
       await runWorker();
