@@ -25,6 +25,7 @@ interface LeakyBucketRateLimiterOptions {
 
 interface LeakyBucketRateLimiter extends RateLimiter {
   stop: () => void;
+  drainAllBucketsOnce: () => Promise<void>;
 }
 
 /**
@@ -53,16 +54,12 @@ export const makeDrainBucket = (
           .exec();
 
         const lockVal = await redis.get(key);
-        console.log('lockVal', lockVal);
-        console.log('randomValue', randomValue);
 
         if (lockVal !== null && lockVal === randomValue) {
           const newVal = await redis.decrby(
             `${bucketTypeName}:${bucketName}:${LeakyBucketSpecialKeys.BucketCurrentCapacity}`,
             bucketSpec.drainCount,
           );
-
-          console.log('newVal', newVal);
 
           // remove from overloaded buckets if now below capacity
           if (newVal < bucketSpec.capacity) {
@@ -123,6 +120,14 @@ export const getLeakyBucketRateLimiter = (
     return await redis.smembers(LeakyBucketSpecialKeys.OverloadedBuckets);
   };
 
+  const drainAllBucketsOnce = async () => {
+    await Promise.all(
+      Object.keys(bucketTypes).map((bucketName) =>
+        makeDrainBucket(redis, bucketName, bucketTypes[bucketName])(),
+      ),
+    );
+  };
+
   const intervals = Object.keys(bucketTypes).map((bucketName) =>
     setInterval(
       makeDrainBucket(redis, bucketName, bucketTypes[bucketName]),
@@ -136,7 +141,7 @@ export const getLeakyBucketRateLimiter = (
     }
   };
 
-  return { wrapTask, getForbiddenFlags, stop };
+  return { wrapTask, getForbiddenFlags, drainAllBucketsOnce, stop };
 };
 
 export const handleBucketUse = async (

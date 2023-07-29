@@ -10,11 +10,16 @@ import {
 
 const sleep = (n: number) => new Promise((resolve) => setTimeout(resolve, n));
 
-const redis = new Redis();
-
 describe('make drain bucket', () => {
+  let redis: Redis.Redis;
+
   beforeAll(async () => {
+    redis = new Redis(process.env.REDIS_URL);
     await redis.flushall();
+  });
+
+  afterAll(async () => {
+    await redis.quit();
   });
 
   test('no double drain on simultaneous fire', async () => {
@@ -27,16 +32,9 @@ describe('make drain bucket', () => {
 
     // simulate 10 runs
     await Promise.all(
-      new Array(10)
-        .fill(true)
-        .map(() =>
-          handleBucketUse(
-            redis,
-            'double-drain-test',
-            'instance-one',
-            bucketSpec,
-          ),
-        ),
+      [...Array(10)].map(() =>
+        handleBucketUse(redis, 'double-drain-test', 'instance-one', bucketSpec),
+      ),
     );
 
     // Expect bucket count to be 10
@@ -67,16 +65,14 @@ describe('make drain bucket', () => {
 
     // simulate 10 runs
     await Promise.all(
-      new Array(10)
-        .fill(true)
-        .map(() =>
-          handleBucketUse(
-            redis,
-            'after-interval-drain-test',
-            'instance-one',
-            bucketSpec,
-          ),
+      [...Array(10)].map(() =>
+        handleBucketUse(
+          redis,
+          'after-interval-drain-test',
+          'instance-one',
+          bucketSpec,
         ),
+      ),
     );
 
     // Expect bucket count to be 10
@@ -105,6 +101,17 @@ describe('make drain bucket', () => {
 });
 
 describe('handle bucket use', () => {
+  let redis: Redis.Redis;
+
+  beforeAll(async () => {
+    redis = new Redis(process.env.REDIS_URL);
+    await redis.flushall();
+  });
+
+  afterAll(async () => {
+    await redis.quit();
+  });
+
   test('can overload bucket', async () => {
     const BUCKET_TYPE = 'simple-overload';
     const BUCKET_NAME = 'one';
@@ -128,6 +135,17 @@ describe('handle bucket use', () => {
 });
 
 describe('integration', () => {
+  let redis: Redis.Redis;
+
+  beforeAll(async () => {
+    redis = new Redis(process.env.REDIS_URL);
+    await redis.flushall();
+  });
+
+  afterAll(async () => {
+    await redis.quit();
+  });
+
   test('can only run one per second', async () => {
     const BUCKET_TYPE = 'integration';
     const BUCKET_NAMES = ['one', 'two', 'three'];
@@ -169,5 +187,7 @@ describe('integration', () => {
         (name) => !forbiddenAfterASecond.includes(`${BUCKET_TYPE}:${name}`),
       ),
     ).toBe(true);
+
+    await rateLimiter.stop();
   });
 });
