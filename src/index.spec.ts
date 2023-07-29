@@ -27,14 +27,16 @@ describe('integration test', () => {
     const rateLimiter = getLeakyBucketRateLimiter({
       redis,
       bucketTypes: {
-        // 6 invocations a second
+        // Drain at 3 invocations a second
         bucket: {
           capacity: 6,
           drainCount: 3,
-          drainInterval: 2000,
+          drainInterval: 1000,
         },
       },
     });
+
+    let highestN = 0;
 
     const task: Task = async (payload: any) => {
       if (payload.n > highestN) {
@@ -50,8 +52,6 @@ describe('integration test', () => {
       forbiddenFlags: rateLimiter.getForbiddenFlags,
       pollInterval: 20, // need a smaller poll interval
     });
-
-    let highestN = 0;
 
     // if i add 7 jobs, 6 should be run after 100ms, but the 7th shouldnt be run until after 1.1 seconds
     await Promise.all(
