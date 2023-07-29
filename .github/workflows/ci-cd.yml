@@ -10,8 +10,9 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 12.22.1-buster
-          # - 14.16.1-buster
+          - 14.21.3-buster
+          - 16.20.1-buster
+          - 18.17.0-buster
 
     container:
       image: node:${{ matrix.node-version }}
