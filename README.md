@@ -50,7 +50,7 @@ Now, you can do:
 ```typescript
 await worker.addJob('send-message', payload, {
   flags: [
-    'send-message-global',
+    'send-message-global:global',
     'send-message-client:b412d632-e004-11ea-87d0-0242ac130003',
     'send-message-phone:+12025550320',
   ],
@@ -64,7 +64,7 @@ perform graphile_worker.add_job(
   'send-message',
   payload,
   flags => ARRAY[
-    'send-message-global',
+    'send-message-global:global',
     'send-message-client:b412d632-e004-11ea-87d0-0242ac130003',
     'send-message-phone:+12025550320'
   ]
